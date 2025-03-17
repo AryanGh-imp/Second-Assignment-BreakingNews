@@ -7,13 +7,14 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.time.LocalDate;
+import java.util.Scanner;
 
 public class Infrastructure {
 
     private final String URL;
     private final String APIKEY;
     private final String JSONRESULT;
-    private ArrayList<News> newsList; // TODO: Create the News class
+    private ArrayList<News> newsList;
 
 
     public Infrastructure(String APIKEY) {
@@ -21,6 +22,7 @@ public class Infrastructure {
         this.URL = "https://newsapi.org/v2/everything?q=tesla&from="
                 + LocalDate.now().minusDays(1) + "&sortBy=publishedAt&apiKey=";
         this.JSONRESULT = getInformation();
+        parseInformation();
     }
 
     public ArrayList<News> getNewsList() {
@@ -54,9 +56,37 @@ public class Infrastructure {
     }
 
     public void displayNewsList() {
-        // TODO: Display titles of the news you got from api
-        //  and print them in a way that user can choose one
-        //  to see the full information of the news
+        if (newsList == null || newsList.isEmpty()) {
+            System.out.println("❌ THERE IS NO NEWS TO DISPLAY ❌");
+            return;
+        }
+
+        System.out.println("\n📢 NEWS LIST : ");
+        for (int i = 0; i < newsList.size(); i++) {
+            System.out.println((i + 1) + ". " + newsList.get(i).getTitle());
+        }
+
+        System.out.println("\n🔢 SELECT THE NEWS NUMBER (0 TO EXIT) : ");
+        Scanner scanner = new Scanner(System.in);
+        int choice;
+
+        while (true) {
+            System.out.print("YOUR CHOICE : ");
+            if (scanner.hasNextInt()) {
+                choice = scanner.nextInt();
+                if (choice == 0) {
+                    System.out.println("🔚 EXIT THE PROGRAM");
+                    break;
+                } else if (choice > 0 && choice <= newsList.size()) {
+                    newsList.get(choice - 1).displayNews();
+                } else {
+                    System.out.println("❌ INVALID NUMBER! PLEASE ENTER AGAIN ❌");
+                }
+            } else {
+                System.out.println("❌ INVALID INPUT! ENTER ONLY NUMBERS ❌");
+                scanner.next();
+            }
+        }
     }
 
 }

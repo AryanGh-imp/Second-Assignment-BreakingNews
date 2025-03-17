@@ -7,7 +7,8 @@ public class Main {
             String apiKey = Config.getApiKey();
             System.out.println("Using API Key: " + apiKey);
 
-            // Continue running the program...
+            Infrastructure inf = new Infrastructure(apiKey);
+            inf.displayNewsList();
 
         }
         catch (RuntimeException e) {
