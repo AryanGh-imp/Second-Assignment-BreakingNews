@@ -16,9 +16,10 @@ public class Infrastructure {
 
     private final String URL;
     private final String APIKEY;
-    private final String JSONRESULT;
+    private String JSONRESULT;
     private ArrayList<News> newsList;
 
+    int newsNumber = 0;
 
     public Infrastructure(String APIKEY) {
         this.APIKEY = APIKEY;
@@ -58,7 +59,7 @@ public class Infrastructure {
         JSONObject jsonObject = new JSONObject(JSONRESULT);
         JSONArray articles = jsonObject.getJSONArray("articles");
 
-        for (int i = 0; i < Math.min(20, articles.length()); i++) {
+        for (int i = newsNumber; i < Math.min(20 + newsNumber, articles.length()); i++) {
             JSONObject article = articles.getJSONObject(i);
 
             String title = article.optString("title", "UNTITLED");
@@ -83,7 +84,7 @@ public class Infrastructure {
             System.out.println((i + 1) + ". " + newsList.get(i).getTitle());
         }
 
-        System.out.println("\n🔢 SELECT THE NEWS NUMBER (0 TO EXIT) : ");
+        System.out.println("\n🔢 SELECT THE NEWS NUMBER (-1 TO NEXT PAGE & 0 TO EXIT) ");
         Scanner scanner = new Scanner(System.in);
         int choice;
 
@@ -93,6 +94,21 @@ public class Infrastructure {
                 choice = scanner.nextInt();
                 if (choice == 0) {
                     System.out.println("🔚 EXIT THE PROGRAM");
+                    break;
+                } else if (choice == -1) {
+                    newsNumber += 20;
+
+                    System.out.println("\n---> NEXT PAGE --->");
+
+                    String updatedJson = getInformation();
+                    if (updatedJson != null) {
+                        newsList.clear(); // Clear the previous list
+                        this.JSONRESULT = updatedJson; // Update JSON (used this for code readability)
+                        parseInformation(); // Processing new news
+                        displayNewsList(); // Show updated news
+                    } else {
+                        System.out.println("❌ FAILED TO FETCH NEW NEWS! ❌");
+                    }
                     break;
                 } else if (choice > 0 && choice <= newsList.size()) {
                     newsList.get(choice - 1).displayNews();
