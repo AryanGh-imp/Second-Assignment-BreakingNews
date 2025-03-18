@@ -6,8 +6,11 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.ArrayList;
-import java.time.LocalDate;
 import java.util.Scanner;
+
+// JSON libs
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 public class Infrastructure {
 
@@ -19,14 +22,9 @@ public class Infrastructure {
 
     public Infrastructure(String APIKEY) {
         this.APIKEY = APIKEY;
-        this.URL = "https://newsapi.org/v2/everything?q=tesla&from="
-                + LocalDate.now().minusDays(1) + "&sortBy=publishedAt&apiKey=";
+        this.URL = "https://newsapi.org/v2/everything?q=technology&sortBy=publishedAt&apiKey=";
         this.JSONRESULT = getInformation();
         parseInformation();
-    }
-
-    public ArrayList<News> getNewsList() {
-        return newsList;
     }
 
     private String getInformation() {
@@ -50,9 +48,28 @@ public class Infrastructure {
     }
 
     private void parseInformation() {
-        // TODO: Get the first 20 news from the articles array of the json result
-        //  and parse the information of each on of them to be mapped to News class
-        //  finally add them to newsList in this class to display them in the output
+        newsList = new ArrayList<>();
+
+        if (JSONRESULT == null || JSONRESULT.isEmpty()) {
+            System.out.println("❌ ERROR 404 ❌");
+            return;
+        }
+
+        JSONObject jsonObject = new JSONObject(JSONRESULT);
+        JSONArray articles = jsonObject.getJSONArray("articles");
+
+        for (int i = 0; i < Math.min(20, articles.length()); i++) {
+            JSONObject article = articles.getJSONObject(i);
+
+            String title = article.optString("title", "UNTITLED");
+            String description = article.optString("description", "NO EXPLANATION");
+            String sourceName = article.getJSONObject("source").optString("name", "UNKNOWN SOURCE");
+            String author = article.optString("author", "UNKNOWN");
+            String url = article.optString("url", "#");
+            String publishedAt = article.optString("publishedAt", "UNCERTAIN");
+
+            newsList.add(new News(title, description, sourceName, author, url, publishedAt));
+        }
     }
 
     public void displayNewsList() {

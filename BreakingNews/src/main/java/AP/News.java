@@ -24,7 +24,7 @@ public class News {
         System.out.println("📅 PUBLISHED AT : " + publishedAt);
         System.out.println("🔎 DESCRIPTION : " + description);
         System.out.println("🔗 URL : " + url);
-        System.out.println("==========================================");
+        System.out.println("======================================================");
     }
 
     public String getTitle() {
